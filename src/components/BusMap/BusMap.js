@@ -50,14 +50,15 @@ const BusMap = () => {
 
   const fetchBusData = async () => {
     try {
-      const response = await fetch("https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==");
-      const jsonData = await response.json();
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==')}`);
+      const data = await response.json();
+      const jsonData = JSON.parse(data.contents);
       const filteredBuses = jsonData.filter((bus) => bus.placa.startsWith("RUTA"));
       setBusData(filteredBuses);
     } catch (error) {
       console.error("Error fetching bus data:", error);
     }
-  };
+  };  
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -69,7 +70,9 @@ const BusMap = () => {
     );
 
     fetchBusData();
+
     const interval = setInterval(fetchBusData, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -113,7 +116,7 @@ const BusMap = () => {
 
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-      <div style={{ width: "100%", height: "100%" }}> {/* Modificado para ocupar todo el espacio */}
+      <div style={{ width: "100%", height: "100%" }}>
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={center}

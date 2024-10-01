@@ -49,10 +49,11 @@ const Header = () => {
           <Link to="/">
             <img src={logo} alt="Logo" className="h-10 w-auto cursor-pointer" />
           </Link>
-          <SearchBar />
+        {/*  <SearchBar /> */} 
         </div>
 
-        <nav className="hidden md:flex space-x-6">
+        {/* Menú en pantallas grandes */}
+        <nav className="hidden lg:flex space-x-6">
           <NavLink to="/" title="Inicio" isActive={isActive('/')}>
             Inicio
           </NavLink>
@@ -66,7 +67,7 @@ const Header = () => {
             Mensajes
           </NavLink>
           <div className="flex flex-col items-center relative">
-            {isLoggedIn && isEmailVerified ? ( // Solo muestra el botón de perfil si el correo está verificado
+            {isLoggedIn && isEmailVerified ? (
               <button
                 onClick={handleProfileClick}
                 title="Perfil"
@@ -91,7 +92,8 @@ const Header = () => {
           </div>
         </nav>
 
-        <div className="md:hidden">
+        {/* Botón para abrir el menú móvil, también visible en pantallas medianas */}
+        <div className="lg:hidden">
           <button
             title="Menú"
             className="text-gray-500 hover:text-[#ff9800] p-2"
@@ -102,7 +104,13 @@ const Header = () => {
         </div>
       </div>
 
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} isLoggedIn={isLoggedIn} isEmailVerified={isEmailVerified} />
+      {/* MobileMenu visible en pantallas pequeñas y medianas */}
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        isLoggedIn={isLoggedIn}
+        isEmailVerified={isEmailVerified}
+      />
     </header>
   );
 };
