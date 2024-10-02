@@ -186,7 +186,7 @@ const BusMap = () => {
           onClick={openModal}
           style={{
             position: "absolute",
-            top: "20px",
+            top: "70px",
             right: "20px",
             background: "white",
             border: "none",
