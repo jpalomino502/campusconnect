@@ -5,6 +5,7 @@ import BusMap from './components/BusMap/BusMap';
 import Home from './components/Home/Home';
 import Profile from './components/Profile/Profile';
 import Login from './components/Auth/Login';
+import Servicios from './components/Servicios/Servicios'; // Asegúrate de que la ruta sea correcta
 import { auth } from './config/firebaseConfig';
 import Settings from './components/Settings/Settings';
 
@@ -21,7 +22,7 @@ const ProtectedRoute = ({ element }) => {
   }, []);
 
   if (loading) {
-    return;
+    return; // Aquí puedes agregar un spinner o un mensaje de carga
   }
 
   return isLoggedIn ? element : <Navigate to="/login" />;
@@ -47,7 +48,7 @@ const UnprotectedRoute = ({ element }) => {
   }, []);
 
   if (loading) {
-    return;
+    return; // Aquí puedes agregar un spinner o un mensaje de carga
   }
 
   return <element.type {...element.props} emailVerified={isEmailVerified} />;
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="/bus" element={<UnprotectedRoute element={<BusMap />} />} />
           <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
           <Route path="/settings" element={<ProtectedRoute element={<Settings />} />} />
+          <Route path="/servicios" element={<UnprotectedRoute element={<Servicios />} />} /> {/* Nueva ruta para Servicios */}
         </Routes>
       </div>
     </Router>

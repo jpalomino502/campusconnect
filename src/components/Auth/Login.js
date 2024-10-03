@@ -1,6 +1,5 @@
-// src/components/Auth/Login.js
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Importar el contexto
+import { useAuth } from '../../contexts/AuthContext';
 import { auth } from '../../config/firebaseConfig';
 import {
   signInWithEmailAndPassword,
@@ -22,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const Login = () => {
-  const { user } = useAuth(); // Obtener el usuario del contexto
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -35,10 +34,18 @@ const Login = () => {
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const navigate = useNavigate();
 
-  // Definición de la función para generar la imagen de perfil por defecto
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   const generateDefaultProfileImage = (email) => {
-    const backgroundColor = '#ffac00'; // Color de fondo
-    const initial = email.charAt(0).toUpperCase(); // Inicial del correo
+    const backgroundColor = getRandomColor();
+    const initial = email.charAt(0).toUpperCase();
 
     return { background: backgroundColor, initial };
   };
@@ -79,7 +86,7 @@ const Login = () => {
             email: user.email,
             career: career,
             id: id,
-            profileImage: `https://via.placeholder.com/150/${background.replace('#', '')}/FFFFFF/?text=${initial}`,
+            photoURL: `https://via.placeholder.com/150/${background.replace('#', '')}/FFFFFF/?text=${initial}`,
           });
 
           setSuccess('Cuenta creada. Por favor verifica tu correo para completar el registro.');

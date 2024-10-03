@@ -1,4 +1,3 @@
-// EditProfileModal.js
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -149,9 +148,9 @@ function EditProfileModal({ isOpen, closeModal, userData, setUserData, user }) {
         style={{
           content: {
             maxHeight: '70vh',
-            maxWidth: '90vh',
-            minWidth: '90vh',
-            margin: '40px',
+            width: '90vw',
+            maxWidth: '600px', // Ancho máximo en dispositivos grandes
+            margin: '40px auto',
             padding: '20px',
             borderRadius: '8px',
             overflowY: 'auto',

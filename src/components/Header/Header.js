@@ -83,16 +83,15 @@ const Header = () => {
         <nav className="hidden lg:flex space-x-6">
           <NavLink to="/" title="Inicio" isActive={isActive('/')}>Inicio</NavLink>
           <NavLink to="/bus" title="Bus" isActive={isActive('/bus')}>Bus</NavLink>
-          <NavLink to="/ventas" title="Ventas" isActive={isActive('/ventas')}>Ventas</NavLink>
-          <NavLink to="/messages" title="Mensajes" isActive={isActive('/messages')}>Mensajes</NavLink>
+          <NavLink to="/servicios" title="Servicios" isActive={isActive('/servicios')}>Servicios</NavLink> {/* Aquí se agrega el enlace de Servicios */}
           <div className="flex flex-col items-center relative">
-            {isAuthChecking ? ( // Mostrar un placeholder mientras se verifica la autenticación
+            {isAuthChecking ? ( 
               <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse"></div>
             ) : isLoggedIn && isEmailVerified ? (
               <button
                 onClick={handleProfileClick}
                 title="Perfil"
-                className="h-10 w-10 p-0 transition duration-300 flex items-center justify-center" // Cambia la altura y anchura del botón
+                className="h-10 w-10 p-0 transition duration-300 flex items-center justify-center" 
               >
                 {/* Mostrar imagen del perfil */}
                 {loading ? (
@@ -101,8 +100,8 @@ const Header = () => {
                   <img
                     src={photoURL}
                     alt="Perfil"
-                    className="h-8 w-8 rounded-full object-cover m-0" // Ajusta el tamaño de la imagen a h-8 w-8
-                    style={{ objectFit: 'cover' }} // Asegura que la imagen se ajuste correctamente
+                    className="h-8 w-8 rounded-full object-cover m-0"
+                    style={{ objectFit: 'cover' }}
                   />
                 ) : (
                   <span className="text-gray-700 text-sm">Perfil</span>

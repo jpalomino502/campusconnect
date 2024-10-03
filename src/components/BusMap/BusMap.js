@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import busIconImg from "../../assets/bus.svg";
 import userIconImg from "../../assets/user.svg";
 import { QRCodeCanvas } from 'qrcode.react';
@@ -38,7 +38,6 @@ const BusMap = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [qrData, setQrData] = useState("");
   const [selectedBus, setSelectedBus] = useState(null);
-  const [directions, setDirections] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -50,9 +49,13 @@ const BusMap = () => {
 
   const fetchBusData = async () => {
     try {
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==')}`);
-      const data = await response.json();
-      const jsonData = JSON.parse(data.contents);
+      const response = await fetch('https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const jsonData = await response.json();
       const filteredBuses = jsonData.filter((bus) => bus.placa.startsWith("RUTA"));
       setBusData(filteredBuses);
     } catch (error) {
@@ -72,7 +75,6 @@ const BusMap = () => {
     fetchBusData();
 
     const interval = setInterval(fetchBusData, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -105,13 +107,6 @@ const BusMap = () => {
 
   const handleBusClick = (bus) => {
     setSelectedBus(bus);
-    if (userLocation) {
-      calculateRoute(userLocation, { lat: bus.lat, lng: bus.lng });
-    }
-  };
-
-  const calculateRoute = (origin, destination) => {
-    setDirections({ origin, destination });
   };
 
   return (
@@ -124,7 +119,7 @@ const BusMap = () => {
           options={{
             disableDefaultUI: true,
             zoomControl: true,
-            gestureHandling: 'auto',
+            gestureHandling: 'greedy',
           }}
         >
           {userLocation && (
@@ -155,31 +150,6 @@ const BusMap = () => {
               onClick={() => handleBusClick(bus)}
             />
           ))}
-
-          {selectedBus && directions && (
-            <DirectionsService
-              options={{
-                origin: directions.origin,
-                destination: directions.destination,
-                travelMode: 'DRIVING',
-              }}
-              callback={(result, status) => {
-                if (status === 'OK') {
-                  setDirections(result);
-                } else {
-                  console.error(`error fetching directions ${result}`);
-                }
-              }}
-            />
-          )}
-
-          {directions && (
-            <DirectionsRenderer
-              options={{
-                directions: directions,
-              }}
-            />
-          )}
         </GoogleMap>
 
         <button

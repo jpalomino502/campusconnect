@@ -2,8 +2,8 @@ import React from 'react';
 
 const Sidebar = () => {
   return (
-    <div className="p-4 bg-white shadow-lg rounded-lg h-full"> {/* Elimina marginLeft para evitar problemas de alineación */}
-      <h3 className="font-bold text-lg mb-4 border-b-2 border-gray-200 pb-2">Sistemas de Información</h3>
+    <div className="p-4 shadow-lg rounded-lg"> {/* Elimina marginLeft para evitar problemas de alineación */}
+      <h3 className="font-bold text-lg ">Sistemas de Información</h3>
       
       {/* Sección de accesos directos */}
       <div className="lista-accesos mb-4">

@@ -39,8 +39,8 @@ const ImageEditor = ({ isOpen, closeModal, image, onCrop, scale, setScale }) => 
                 <AvatarEditor
                     ref={editorRef}
                     image={image}
-                    width={840} // Cambia este valor al ancho que desees. Aquí es proporcional a 21:9
-                    height={360} // Ajusta la altura para que mantenga la proporción 21:9 (ancho / 2.33)
+                    width={800} // Ancho ajustado a la proporción 16:9
+                    height={450} // Alto ajustado a la proporción 16:9
                     border={20}
                     scale={scale}
                     rotate={0}

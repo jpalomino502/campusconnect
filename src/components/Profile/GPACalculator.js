@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaTrash } from 'react-icons/fa'; // Importa el icono de basura
+import { FaTrash } from 'react-icons/fa';
 
 const GPACalculator = () => {
   const [subjects, setSubjects] = useState([{ name: '', credits: '', grade: '' }]);
@@ -54,32 +54,43 @@ const GPACalculator = () => {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-lg mx-auto w-full max-w-lg">
+    <div className="p-4 bg-white rounded-lg shadow-lg mx-auto w-full max-w-md">
       <h3 className="text-2xl font-bold mb-2 text-center text-gray-800">Calculadora de PGA</h3>
       <p className="text-gray-600 text-sm mb-4">
-        La calculadora de PGA permite calcular el promedio ponderado de tus calificaciones. 
-        Para calcular el PGA, se multiplican los créditos de cada materia por la calificación obtenida en ella. 
-        Luego, se suman todos los puntos obtenidos y se dividen entre el total de créditos. 
-        Este método asegura que las materias con más créditos tengan un mayor impacto en el GPA final.
+        La calculadora de PGA permite calcular el promedio ponderado de tus calificaciones. Para calcular el PGA, 
+        ingresa los créditos y la calificación obtenida en cada materia. Las materias con más créditos tendrán 
+        un mayor impacto en el GPA final.
       </p>
       {subjects.map((subject, index) => (
-        <div key={index} className="flex mb-2 items-center">
-          <input
-            type="number"
-            name="credits"
-            placeholder="Créditos"
-            value={subject.credits}
-            onChange={(event) => handleChange(index, event)}
-            className="flex-1 p-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300 mx-2"
-          />
-          <input
-            type="number"
-            name="grade"
-            placeholder="Calificación"
-            value={subject.grade}
-            onChange={(event) => handleChange(index, event)}
-            className="flex-1 p-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300 mx-2"
-          />
+        <div key={index} className="flex mb-4 items-center flex-wrap">
+          <div className="relative flex-1 mx-2 mb-4">
+            <input
+              type="number"
+              name="credits"
+              placeholder=" "
+              value={subject.credits}
+              onChange={(event) => handleChange(index, event)}
+              onWheel={(e) => e.preventDefault()}
+              className="peer p-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300 rounded-md"
+            />
+            <label className={`absolute left-2 top-2 transition-all duration-200 ease-in-out text-gray-600 ${subject.credits ? 'transform -translate-y-4 scale-75' : ''}`}>
+              Créditos
+            </label>
+          </div>
+          <div className="relative flex-1 mx-2 mb-4">
+            <input
+              type="number"
+              name="grade"
+              placeholder=" "
+              value={subject.grade}
+              onChange={(event) => handleChange(index, event)}
+              onWheel={(e) => e.preventDefault()}
+              className="peer p-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300 rounded-md"
+            />
+            <label className={`absolute left-2 top-2 transition-all duration-200 ease-in-out text-gray-600 ${subject.grade ? 'transform -translate-y-4 scale-75' : ''}`}>
+              Calificación
+            </label>
+          </div>
           {subjects.length > 1 && index > 0 && (
             <button
               onClick={() => handleRemoveSubject(index)}

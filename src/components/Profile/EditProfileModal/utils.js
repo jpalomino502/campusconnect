@@ -13,7 +13,6 @@ export const dataURLToFile = (dataUrl, filename) => {
   };
   
   export const convertToWebP = (file) => {
-    // Logic to convert file to webp format if needed
     return file;
   };
   

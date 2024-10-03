@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, updateDoc, doc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, addDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css'; 
 import 'slick-carousel/slick/slick-theme.css';
@@ -12,16 +13,19 @@ import Sidebar from './Sidebar';
 
 const Home = () => {
   const { user } = useAuth();
+  const navigate = useNavigate(); // Inicializa useNavigate
   const [posts, setPosts] = useState([]);
   const [news, setNews] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [visibleComments, setVisibleComments] = useState({});
+  const [usersData, setUsersData] = useState({});
+  const [userLikes, setUserLikes] = useState({}); // Para rastrear los likes de cada usuario
 
   useEffect(() => {
     const fetchPostsAndNews = async () => {
-      setLoading(true);
-
       const usersRef = collection(db, 'users');
       const usersSnapshot = await getDocs(usersRef);
       const usersData = {};
@@ -29,6 +33,8 @@ const Home = () => {
       usersSnapshot.forEach(userDoc => {
         usersData[userDoc.id] = userDoc.data();
       });
+      
+      setUsersData(usersData);
 
       const allPosts = [];
       for (const uid in usersData) {
@@ -42,7 +48,6 @@ const Home = () => {
       }
 
       setPosts(allPosts);
-
       const newsRef = collection(db, 'publicaciones');
       const newsSnapshot = await getDocs(newsRef);
       const newsData = newsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -51,7 +56,10 @@ const Home = () => {
     };
 
     fetchPostsAndNews();
-    const interval = setInterval(fetchPostsAndNews, 30000);
+
+    const interval = setInterval(() => {
+      fetchPostsAndNews();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -74,31 +82,90 @@ const Home = () => {
   };
 
   const handleLike = async (postId) => {
-    const postRef = doc(db, 'users', user.uid, 'posts', postId);
-    const post = posts.find(p => p.postId === postId);
+    // Redirigir a login si el usuario no está autenticado
+    if (!user) {
+      navigate('/login'); // Cambia '/login' por la ruta de tu página de inicio de sesión
+      return;
+    }
+
+    const postIndex = posts.findIndex(p => p.postId === postId);
+    if (postIndex === -1) return;
+  
+    const postRef = doc(db, 'users', posts[postIndex].userId, 'posts', postId);
+    const userLiked = userLikes[postId]?.includes(user.uid);
+    
+    if (userLiked) {
+      await updateDoc(postRef, {
+        likes: posts[postIndex].likes - 1,
+      });
+      setUserLikes(prev => ({
+        ...prev,
+        [postId]: prev[postId].filter(uid => uid !== user.uid),
+      }));
+    } else {
+      await updateDoc(postRef, {
+        likes: posts[postIndex].likes + 1,
+      });
+      setUserLikes(prev => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), user.uid],
+      }));
+    }
+  
+    const updatedPosts = [...posts];
+    updatedPosts[postIndex].likes = userLiked ? posts[postIndex].likes - 1 : posts[postIndex].likes + 1;
+    setPosts(updatedPosts);
+    
+    const likeButton = document.querySelector(`.like-button[data-id="${postId}"]`);
+    if (likeButton) {
+      likeButton.classList.add("like-animation");
+      setTimeout(() => {
+        likeButton.classList.remove("like-animation");
+      }, 300);
+    }
+  };
+  
+  const handleCommentSubmit = async (postId) => {
+    // Redirigir a login si el usuario no está autenticado
+    if (!user) {
+      navigate('/login'); // Cambia '/login' por la ruta de tu página de inicio de sesión
+      return;
+    }
+
+    if (!newComment) return;
+
+    const postIndex = posts.findIndex(p => p.postId === postId);
+    if (postIndex === -1) return;
+
+    const postRef = doc(db, 'users', posts[postIndex].userId, 'posts', postId);
+    
+    if (!posts[postIndex].comments) {
+      posts[postIndex].comments = [];
+    }
 
     await updateDoc(postRef, {
-      likes: post.likes + 1,
+      comments: arrayUnion({
+        userId: user.uid,
+        comment: newComment,
+        timestamp: new Date().toISOString(),
+      }),
     });
 
-    setPosts(prevPosts => 
-      prevPosts.map(p => 
-        p.postId === postId ? { ...p, likes: p.likes + 1 } : p
-      )
-    );
+    const updatedPosts = [...posts];
+    updatedPosts[postIndex].comments.push({
+      userId: user.uid, 
+      comment: newComment, 
+      timestamp: new Date().toISOString()
+    });
+    setPosts(updatedPosts);
+    setNewComment('');
   };
 
-  const formatDate = (timestamp) => {
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    };
-    const date = new Date(timestamp);
-    return date.toLocaleString('es-ES', options);
+  const toggleCommentsVisibility = (postId) => {
+    setVisibleComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
   };
 
   const sliderSettings = {
@@ -115,31 +182,37 @@ const Home = () => {
   return (
     <div className="flex">
       <div className="flex-1 container mx-auto p-2 space-y-2">
+        <div
+          onClick={() => setModalIsOpen(true)}
+          className="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-pointer hover:bg-gray-200 transition"
+        >
+          <p className="text-gray-500 text-sm">¿Qué estás pensando?</p>
+        </div>
         <section className="mb-10">
           {loading ? (
-            <Skeleton height={150} count={1} />
+            <div className="bg-gray-300 h-64 rounded-lg w-full" />
           ) : (
             <Slider {...sliderSettings} className="mySwiper">
               {news.length > 0 ? news.map((item) => (
                 <div key={item.id} className="p-1 flex flex-col items-center">
-                  <div className="relative w-full">
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="w-full">
-                    <img
-                      src={item.image}
-                      alt="Noticia"
-                      className="rounded-lg w-[70%] h-[calc(70vw*3/7)] object-cover mx-auto"
-                    />
-                    </a>
-                    <p className="text-gray-700 mt-1 text-sm">{item.text || ''}</p>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 bg-[#ff9800] text-white px-2 py-1 text-xs rounded-md hover:bg-orange-600 transition"
-                    >
-                      Leer más
+                  <div className="relative w-full" style={{ paddingBottom: '40%' }}>
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="w-full h-full absolute inset-0">
+                      <img
+                        src={item.image}
+                        alt="Noticia"
+                        className="rounded-lg absolute inset-0 w-full h-full object-cover"
+                      />
                     </a>
                   </div>
+                  <p className="text-gray-700 mt-2 text-sm">{item.text || ''}</p>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 bg-[#ff9800] text-white px-2 py-1 text-xs rounded-md hover:bg-orange-600 transition"
+                  >
+                    Leer más
+                  </a>
                 </div>
               )) : (
                 <div className="text-center">No hay noticias disponibles.</div>
@@ -147,13 +220,6 @@ const Home = () => {
             </Slider>
           )}
         </section>
-
-        <div
-          onClick={() => setModalIsOpen(true)}
-          className="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-pointer hover:bg-gray-200 transition"
-        >
-          <p className="text-gray-500 text-sm">¿Qué estás pensando?</p>
-        </div>
 
         <PostModal 
           isOpen={modalIsOpen} 
@@ -182,17 +248,57 @@ const Home = () => {
                     </div>
                   </div>
                   <p className="text-gray-800 text-sm">{post.content}</p>
-                  {post.media?.map((mediaUrl, index) => (
-                    <img key={index} src={mediaUrl} alt={`media-${index}`} className="w-full mt-2 rounded" />
-                  ))}
+                  
+                  <div className="flex justify-center mt-2">
+                    {post.media?.map((mediaUrl, index) => (
+                      <img key={index} src={mediaUrl} alt={`media-${index}`} className="max-w-full h-auto rounded" />
+                    ))}
+                  </div>
+
                   <div className="flex items-center mt-1">
-                    <button onClick={() => handleLike(post.postId)} className="flex items-center text-gray-600 hover:text-red-600 mr-2 text-sm">
-                      <FaHeart className="mr-1" /> {post.likes || 0}
+                    <button 
+                      onClick={() => handleLike(post.postId)} 
+                      className={`like-button flex items-center mr-2 text-sm ${userLikes[post.postId]?.includes(user.uid) ? 'text-red-600' : 'text-gray-600 hover:text-red-600'}`} 
+                      data-id={post.postId}
+                    >
+                      <FaHeart className="mr-1" /> 
+                      <span className={`like-count ${post.likes > 0 ? "opacity-100" : "opacity-0"}`}>
+                        {post.likes || 0}
+                      </span>
                     </button>
-                    <button className="flex items-center text-gray-600 hover:text-blue-600 text-sm">
+                    <button onClick={() => toggleCommentsVisibility(post.postId)} className="flex items-center text-gray-600 hover:text-blue-600 text-sm">
                       <FaComment className="mr-1" /> {post.comments?.length || 0} Comentarios
                     </button>
                   </div>
+
+                  {visibleComments[post.postId] && (
+                    <div className="mt-2">
+                      <div>
+                        {post.comments?.map((comment, index) => (
+                          <div key={index} className="border-t py-1 flex items-start">
+                            <img src={usersData[comment.userId]?.photoURL || ''} alt="Comentario" className="w-6 h-6 rounded-full mr-2" />
+                            <div>
+                              <span className="font-semibold">{usersData[comment.userId]?.displayName || 'Usuario'}</span>: {comment.comment}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <input 
+                        type="text" 
+                        value={newComment} 
+                        onChange={(e) => setNewComment(e.target.value)} 
+                        placeholder="Escribe un comentario..."
+                        className="border rounded p-1 w-full mt-2"
+                      />
+                      <button 
+                        onClick={() => handleCommentSubmit(post.postId)} 
+                        className="bg-[#ff9800]text-white rounded px-2 py-1 mt-1"
+                      >
+                        Comentar
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

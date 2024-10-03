@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaHome, FaShoppingCart, FaEnvelope, FaBus, FaUser, FaTimes } from 'react-icons/fa';
+import { FaHome, FaBus, FaUser, FaTimes } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const MobileMenu = ({ isOpen, onClose, isLoggedIn, isEmailVerified }) => {
@@ -44,22 +44,18 @@ const MobileMenu = ({ isOpen, onClose, isLoggedIn, isEmailVerified }) => {
             <FaHome size={24} />
             <span>Publicaciones</span>
           </Link>
-          <Link to="/ventas" className={`flex items-center space-x-3 text-lg ${isActive('/ventas') ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]'}`} title="Ventas">
-            <FaShoppingCart size={24} />
-            <span>Ventas</span>
-          </Link>
-          <Link to="/messages" className={`flex items-center space-x-3 text-lg ${isActive('/messages') ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]'}`} title="Mensajes">
-            <FaEnvelope size={24} />
-            <span>Mensajes</span>
-          </Link>
           <Link to="/bus" className={`flex items-center space-x-3 text-lg ${isActive('/bus') ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]'}`} title="Bus">
             <FaBus size={24} />
             <span>Bus</span>
           </Link>
+          <Link to="/servicios" className={`flex items-center space-x-3 text-lg ${isActive('/servicios') ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]'}`} title="Servicios"> {/* Aquí se agrega el enlace de Servicios */}
+            <FaUser size={24} />
+            <span>Servicios</span>
+          </Link>
           <button
             onClick={handleProfileClick}
             className={`flex items-center space-x-3 text-lg ${
-              isActive('/profile') ? 'text-[#ff9800]' : (isActive('/login') && !isLoggedIn ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]')
+              isActive('/profile') ? 'text-[#ff9800] border-b-2 border-[#ff9800]' : (isActive('/login') && !isLoggedIn ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]')
             }`}
             title={isLoggedIn ? (isEmailVerified ? 'Perfil' : 'Iniciar Sesión') : 'Iniciar Sesión'}
           >

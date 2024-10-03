@@ -53,3 +53,30 @@ a {
   position: relative;
   z-index: 10;
 }
+
+.like-button {
+  transition: transform 0.3s;
+}
+
+.like-animation {
+  transform: scale(1.2);
+}
+
+input {
+  outline: none;
+}
+
+input:focus ~ label,
+input:not(:placeholder-shown) ~ label {
+  transform: translateY(-20px) scale(0.75);
+  color: #3b82f6; /* Color de texto del label cuando está en foco */
+}
+
+label {
+  position: absolute;
+  left: 0.5rem;
+  top: 1rem;
+  color: #a1a1aa; /* Color del label por defecto */
+  transition: 0.2s ease all;
+}
+
