@@ -1,9 +1,12 @@
+// src/components/Auth/Login.js
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext'; // Importar el contexto
 import { auth } from '../../config/firebaseConfig';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import loginImage from '../../assets/login.svg';
@@ -16,8 +19,10 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Login = () => {
+  const { user } = useAuth(); // Obtener el usuario del contexto
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -28,8 +33,15 @@ const Login = () => {
   const [success, setSuccess] = useState('');
   const [view, setView] = useState('login');
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
-
   const navigate = useNavigate();
+
+  // Definición de la función para generar la imagen de perfil por defecto
+  const generateDefaultProfileImage = (email) => {
+    const backgroundColor = '#ffac00'; // Color de fondo
+    const initial = email.charAt(0).toUpperCase(); // Inicial del correo
+
+    return { background: backgroundColor, initial };
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +61,6 @@ const Login = () => {
         const user = userCredential.user;
 
         if (user.emailVerified) {
-          console.log("Usuario verificado, redirigir a perfil");
           navigate('/profile');
         } else {
           setShowVerificationMessage(true);
@@ -57,28 +68,39 @@ const Login = () => {
       } else if (view === 'register') {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
         if (user.email.endsWith('@unab.edu.co')) {
           await sendEmailVerification(user);
+
+          const { background, initial } = generateDefaultProfileImage(user.email);
 
           await setDoc(doc(db, 'users', user.uid), {
             displayName: name,
             email: user.email,
             career: career,
             id: id,
+            profileImage: `https://via.placeholder.com/150/${background.replace('#', '')}/FFFFFF/?text=${initial}`,
           });
 
           setSuccess('Cuenta creada. Por favor verifica tu correo para completar el registro.');
 
-          setTimeout(() => {
-            resetForm();
-            window.location.reload();
-          }, 5000);
+          Swal.fire({
+            title: '¡Cuenta creada!',
+            text: 'Por favor verifica tu correo para completar el registro.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              resetForm();
+              window.location.reload();
+            }
+          });
         } else {
           setError('El correo debe ser del dominio @unab.edu.co');
         }
       } else if (view === 'forgotPassword') {
-        await auth.sendPasswordResetEmail(email);
-        setSuccess('Correo de restablecimiento de contraseña enviado a ' + email);
+        await sendPasswordResetEmail(auth, email);
+        setSuccess('Correo de restablecimiento de contraseña enviado a ' + email + '. Revisa tu bandeja de entrada.');
         setEmail('');
       }
     } catch (err) {
@@ -92,7 +114,7 @@ const Login = () => {
     setPassword('');
     setName('');
     setCareer('');
-    setId(''); 
+    setId('');
   };
 
   const toggleView = (view) => {
@@ -145,22 +167,24 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <div className="relative">
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute right-2 top-3 text-gray-600"
-          >
-            {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
-          </button>
-        </div>
+        {view !== 'forgotPassword' && (
+          <div className="relative">
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+            >
+              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+            </button>
+          </div>
+        )}
         <Button type="submit">
           {view === 'register' ? 'Registrarse' : view === 'forgotPassword' ? 'Restablecer Contraseña' : 'Iniciar Sesión'}
         </Button>
