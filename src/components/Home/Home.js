@@ -230,9 +230,10 @@ const Home = () => {
         />
 
         <div className="flex mt-2 space-x-2">
-          <div className="hidden lg:block w-1/4 h-[calc(100vh-64px)] overflow-y-auto sticky top-16">
-            <Sidebar />
-          </div>
+        <div className="hidden lg:block w-1/4 h-[calc(100vh-64px)] overflow-y-auto overflow-x-hidden sticky top-[20px]">
+  <Sidebar />
+</div>
+
 
           <div className="flex-1 space-y-2">
             {loading ? (
@@ -303,8 +304,9 @@ const Home = () => {
               ))
             )}
           </div>
-          <div className="hidden lg:block w-1/4 h-[calc(100vh-64px)] overflow-y-auto sticky top-16 mr-4"> {/* Añade margen a la derecha */}
+          <div className="hidden lg:block w-1/4 h-[calc(100vh-64px)] overflow-y-auto overflow-x-hidden sticky top-[20px]">
           </div>
+
         </div>
       </div>
     </div>

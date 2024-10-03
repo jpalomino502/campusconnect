@@ -59,7 +59,7 @@ const App = () => {
   return (
     <Router>
       <Header />
-      <div style={{ paddingTop: "60px", height: "calc(100vh - 60px)", overflowY: "auto" }}>
+      <div style={{ height: "calc(100vh - 60px)", overflowY: "auto" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<UnprotectedRoute element={<Login />} />} />
