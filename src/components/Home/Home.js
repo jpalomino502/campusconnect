@@ -303,6 +303,8 @@ const Home = () => {
               ))
             )}
           </div>
+          <div className="hidden lg:block w-1/4 h-[calc(100vh-64px)] overflow-y-auto sticky top-16 mr-4"> {/* Añade margen a la derecha */}
+          </div>
         </div>
       </div>
     </div>

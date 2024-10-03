@@ -37,7 +37,6 @@ const BusMap = () => {
   const [rotatedIcons, setRotatedIcons] = useState({});
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [qrData, setQrData] = useState("");
-  const [selectedBus, setSelectedBus] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -49,13 +48,9 @@ const BusMap = () => {
 
   const fetchBusData = async () => {
     try {
-      const response = await fetch('https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const jsonData = await response.json();
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api2.gpsmobile.net/api/rep-actual/ultimo-avl/d6871041==')}`);
+      const data = await response.json();
+      const jsonData = JSON.parse(data.contents);
       const filteredBuses = jsonData.filter((bus) => bus.placa.startsWith("RUTA"));
       setBusData(filteredBuses);
     } catch (error) {
@@ -75,6 +70,7 @@ const BusMap = () => {
     fetchBusData();
 
     const interval = setInterval(fetchBusData, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -105,10 +101,6 @@ const BusMap = () => {
     setModalIsOpen(false);
   };
 
-  const handleBusClick = (bus) => {
-    setSelectedBus(bus);
-  };
-
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <div style={{ width: "100%", height: "100%" }}>
@@ -119,7 +111,7 @@ const BusMap = () => {
           options={{
             disableDefaultUI: true,
             zoomControl: true,
-            gestureHandling: 'greedy',
+            gestureHandling: 'greedy', // Permite mover sin usar Ctrl
           }}
         >
           {userLocation && (
@@ -147,7 +139,6 @@ const BusMap = () => {
                 fontWeight: "bold",
                 className: "bus-label",
               }}
-              onClick={() => handleBusClick(bus)}
             />
           ))}
         </GoogleMap>
