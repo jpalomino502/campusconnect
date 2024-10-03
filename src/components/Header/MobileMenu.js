@@ -55,7 +55,7 @@ const MobileMenu = ({ isOpen, onClose, isLoggedIn, isEmailVerified }) => {
           <button
             onClick={handleProfileClick}
             className={`flex items-center space-x-3 text-lg ${
-              isActive('/profile') ? 'text-[#ff9800] border-b-2 border-[#ff9800]' : (isActive('/login') && !isLoggedIn ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]')
+              isActive('/profile') ? 'text-[#ff9800]' : (isActive('/login') && !isLoggedIn ? 'text-[#ff9800]' : 'text-gray-600 hover:text-[#ff9800]')
             }`}
             title={isLoggedIn ? (isEmailVerified ? 'Perfil' : 'Iniciar Sesión') : 'Iniciar Sesión'}
           >

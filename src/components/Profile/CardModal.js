@@ -20,7 +20,7 @@ const CardModal = ({ isOpen, closeModal, userData }) => {
     <Modal show={isOpen} onHide={closeModal} backdrop="static" className="flex items-center justify-center">
       <div className="fixed inset-0 bg-black opacity-50" onClick={closeModal} />
       <Modal.Body className="p-0">
-        <div className="relative max-w-md mx-auto mt-16 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 max-w-md w-full"> {/* Ajuste para centrar el modal */}
           {/* Botón de cerrar modal */}
           <button
             onClick={closeModal}
@@ -63,3 +63,4 @@ const CardModal = ({ isOpen, closeModal, userData }) => {
 };
 
 export default CardModal;
+ 
