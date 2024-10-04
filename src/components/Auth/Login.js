@@ -137,17 +137,17 @@ const Login = () => {
 
   const renderView = () => (
     <motion.div
-      className="flex flex-col p-12 bg-white shadow-lg rounded-md relative"
+      className="flex flex-col p-6 md:p-12 bg-white shadow-lg rounded-md relative"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      style={{ minHeight: '600px', width: '450px' }}
+      style={{ minHeight: '400px', width: '100%', maxWidth: '450px' }}
     >
-      <h2 className="text-3xl md:text-4xl font-bold text-center text-[#ffac00] mb-6">
+      <h2 className="text-2xl md:text-4xl font-bold text-center text-[#ffac00] mb-6">
         {view === 'register' ? 'Registrarse' : view === 'forgotPassword' ? 'Olvidé mi Contraseña' : 'Iniciar Sesión'}
       </h2>
       <Notification error={error} success={success} showVerificationMessage={showVerificationMessage} />
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
         {view === 'register' && (
           <>
             <Input
@@ -201,7 +201,7 @@ const Login = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-white relative">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-white">
       <div
         className="hidden lg:flex lg:w-3/5 bg-cover"
         style={{
@@ -212,7 +212,7 @@ const Login = () => {
           height: '100vh',
         }}
       />
-      <div className="flex items-center justify-center w-full lg:w-2/5">
+      <div className="flex items-center justify-center w-full lg:w-2/5 p-6 md:p-12">
         <div className="bg-white shadow-lg rounded-md relative z-10">
           {renderView()}
         </div>

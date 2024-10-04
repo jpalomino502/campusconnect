@@ -1,3 +1,4 @@
+// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './components/Header/Header';
@@ -5,7 +6,7 @@ import BusMap from './components/BusMap/BusMap';
 import Home from './components/Home/Home';
 import Profile from './components/Profile/Profile';
 import Login from './components/Auth/Login';
-import Servicios from './components/Servicios/Servicios'; // Asegúrate de que la ruta sea correcta
+import Servicios from './components/Servicios/Servicios';
 import { auth } from './config/firebaseConfig';
 import Settings from './components/Settings/Settings';
 
@@ -22,7 +23,7 @@ const ProtectedRoute = ({ element }) => {
   }, []);
 
   if (loading) {
-    return; // Aquí puedes agregar un spinner o un mensaje de carga
+    return <div>Loading...</div>; // Mensaje o spinner de carga
   }
 
   return isLoggedIn ? element : <Navigate to="/login" />;
@@ -48,7 +49,7 @@ const UnprotectedRoute = ({ element }) => {
   }, []);
 
   if (loading) {
-    return; // Aquí puedes agregar un spinner o un mensaje de carga
+    return <div></div>;
   }
 
   return <element.type {...element.props} emailVerified={isEmailVerified} />;
@@ -58,14 +59,14 @@ const App = () => {
   return (
     <Router>
       <Header />
-      <div style={{ height: "calc(100vh - 60px)" }}>
+      <div style={{ height: "calc(100vh - 60px)", overflowY: "auto" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<UnprotectedRoute element={<Login />} />} />
           <Route path="/bus" element={<UnprotectedRoute element={<BusMap />} />} />
           <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
           <Route path="/settings" element={<ProtectedRoute element={<Settings />} />} />
-          <Route path="/servicios" element={<UnprotectedRoute element={<Servicios />} />} /> {/* Nueva ruta para Servicios */}
+          <Route path="/servicios" element={<UnprotectedRoute element={<Servicios />} />} />
         </Routes>
       </div>
     </Router>
